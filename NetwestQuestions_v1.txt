@@ -1,0 +1,782 @@
+Resource	Questions	 
+ 	 	 
+Phaneendra	1) What are the different metrics shown in health endpoint of actuator.	
+Ans:
+For example, There is a /health endpoint that provides basic information about the application’s health. The /metrics endpoint shows several useful metrics information like JVM memory used, system CPU usage, open files, and much more. The /loggers endpoint shows application’s logs and also lets you change the log level at runtime. 
+Securing Actuator Endpoints with Spring Security
+Actuator endpoints are sensitive and must be secured from unauthorized access. If Spring Security is present in your application, then the endpoints are secured by default using a form-based HTTP basic authentication.
+
+If not, you can add spring security to your application using the following dependency -
+
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+server.port = 9000
+management.server.port = 9001
+management.server.address= 127.0.0.1
+### actuator endpoint config
+management.info.java.enabled=true
+management.info.env.enabled=true
+
+management.endpoints.web.exposure.include=*
+management.endpoint.metrics.enabled=true
+management.endpoint.metrics.jvm.enabled=true
+management.endpoint.metrics.cache.enabled=true
+management.metrics.enable.process.files=true
+management.metrics.web.server.requests=true
+management.endpoint.metrics.web.server.requests=true
+
+  # properties to expose
+info.app.website=knowledge-cafe.dev
+info.app.builddate=2023-04-28
+info.app.version=1.2
+
+--------------------------------------------------
+ 	2) Design patterns
+           singleton - single instance throught application
+		There are 3️⃣ main scenarios that breaks ❌ Singleton even though we make it Thread Safe❗️They are:
+
+Cloning
+Deserialization
+Reflection
+public class Singleton {
+ 
+    private static final Singleton INSTANCE = new Singleton();
+ 
+    private Singleton() {
+        // Check if we already have an instance
+        if (INSTANCE != null) {
+           throw new IllegalStateException("Singleton" +
+             " instance already created.");
+        }
+    }
+    public static final Singleton getInstance() {
+        return INSTANCE;
+    }
+    private Object readResolve() throws ObjectStreamException         {
+            return INSTANCE;
+    }
+    private Object writeReplace() throws ObjectStreamException {
+            return INSTANCE;
+    }
+    public Object clone() throws CloneNotSupportedException {
+        // return INSTANCE
+        throw new CloneNotSupportedException();
+    }
+}
+
+
+           Factory - Super classes and factory class will do creational part. child class decide which child class object will be created.
+               interface shape { void area();}
+               class square implements shape {
+                 --impl }
+
+		 class circle implements shape {
+                 --impl }
+
+              class ShapeFactory {
+               private Square sq;
+               private Circle cr;
+              
+               public ShapeFactory(Square sq,Circle cr) {
+                   Square sq =new Square();
+ 			 Circle cr =new Circle();
+              }
+              
+             getShapeObject(String type) {
+		if(type="circle") return c
+		else return sq
+	    }
+
+           main () { Shape circle =  getShapeObject("circle");}
+
+         Abstract Factory:
+            Abstract Factory is a creational design pattern that lets you produce families of related objects without specifying their concrete classes.
+public interface ProductFactory {
+    Product createProduct();
+}
+
+create class ProductAFactory and ProductBFactory ->both imp ProductFactory.
+-ProductAFactory produce prodA
+-ProductBFactory produce prodB
+
+public class ProductAFactory implements ProductFactory{
+    @Override
+    public Product createProduct() {
+        return new ProductA();
+    }
+}
+
+public class ProductBFactory implements ProductFactory{
+    @Override
+    public Product createProduct() {
+        return new ProductB();
+    }
+}
+
+// Create Product A using ProductAFactory
+ProductFactory productAFactory = new ProductAFactory();
+Product productA = productAFactory.createProduct();
+System.out.println("Product A: " + productA.getName());
+
+Builder pattern:
+
+custructing complex objects -> inside ->static Builder class -> create setter method like(name("Sample Beer")
+                drinkSize(330) which returns builder object) and create build method and add call contructor of actual class by passing build obj.
+create actual class -> 
+@Builder
+@Getter
+@Setter
+public class Beer {
+
+    //required
+    private String name;
+    private double drinkSize;
+    private double alcoholPercentage;
+    private double price;
+
+    // Other attributes
+    private String brewery;            // The brewery that produces the beer.
+    private String countryOfOrigin;    // The country where the beer is originally from.
+    private String description;        // A brief description of the beer's characteristics.
+    private String packaging;          // The packaging type (bottle, can, draft, etc.).
+    private String servingTemperature; // The recommended serving temperature.
+    private String foodPairing;        // Foods that pair well with this beer.
+
+}
+@RestController
+@RequestMapping("/api/beers")
+public class BeerController {
+
+    @GetMapping("/basic")
+    public String createStandardBeer() {
+        Beer beer = Beer.builder()
+                .name("Standard Beer")
+                .drinkSize(500)
+                .alcoholPercentage(5.0)
+                .price(5.99)
+                .build();
+
+        return "Created beer: " + beer.getName() + 
+                ", Drink Size: " + beer.getDrinkSize() +
+                ", Alcohol Percentage: " + beer.getAlcoholPercentage() +
+                ", Price: " + beer.getPrice();
+    }
+
+    @GetMapping("/premium")
+    public String createPremiumBeer() {
+        Beer beer = Beer.builder()
+                .name("Sample Beer")
+                .drinkSize(330)
+                .alcoholPercentage(5.0)
+                .price(10.99)
+                .brewery("Crafty Brews")
+                .countryOfOrigin("United States")
+                .description("A refreshing lager with a smooth taste.")
+                .packaging("Bottle")
+                .servingTemperature("4-6°C")
+                .foodPairing("Pairs well with grilled chicken and salads.")
+                .build();
+
+        return "Created beer: " + beer.getName() + 
+                ", Drink Size: " + beer.getDrinkSize() +
+                ", Alcohol Percentage: " + beer.getAlcoholPercentage() +
+                ", Price: " + beer.getPrice() +
+                ", Brewery: " + beer.getBrewery() +
+                ", Country of Origin: " + beer.getCountryOfOrigin() +
+                ", Description: " + beer.getDescription() +
+                ", Packaging: " + beer.getPackaging() +
+                ", Serving Temperature: " + beer.getServingTemperature() +
+                ", Food Pairing: " + beer.getFoodPairing();
+    }
+
+}
+Advantages
+
+Reduces the number of parameters in the constructor and provides readable method calls.
+Allows object instantiation in a complete state.
+Simplifies the building process of immutable objects.
+
+	 
+ Single Responsibility Principle (SRP): Each class should be responsible for a single part or functionality of the system. This principle ensures that a class has only one reason to change, making it easier to maintain and test.
+1. Separating email functionality:
+2. Separating business logic: If you have a class that handles both business logic and database access
+public class Employee {
+    private String name;
+    private String address;
+    private String email;
+
+    public void saveEmployee(Employee employee) {
+        // Save employee data to the database
+    }
+
+    public void sendEmail(Employee employee, String message) {
+        // Send an email to the employee
+    }
+
+    public void calculateSalary(Employee employee) {
+        // Calculate the salary of the employee
+    }
+}
+
+Open-Closed Principle (OCP): Software components should be open for extension, but not for modification. This principle ensures that the existing code is not modified, but new functionality can be added by extending the existing code.
+public abstract class Shape {
+    public abstract void draw();
+}
+
+public class Circle extends Shape {
+    @Override
+    public void draw() {
+        // Draw a circle on the screen
+    }
+}
+
+public class Square extends Shape {
+    @Override
+    public void draw() {
+        // Draw a square on the screen
+    }
+}
+
+public class Rectangle extends Shape {
+    @Override
+    public void draw() {
+        // Draw a rectangle on the screen
+    }
+
+Liskov Substitution Principle (LSP): Objects of a superclass should be replaceable with objects of its subclasses without breaking the system. This principle ensures that the behavior of the superclass is preserved in its subclasses.
+Ex. Shape sh = new Circle();
+
+Interface Segregation Principle (ISP): No client should be forced to depend on methods that it does not use. This principle ensures that a class should not be forced to implement methods that it does not need.
+interface ITEmployee {
+testthecode();
+doCoding();
+}
+the above is not good.
+create interface Tester and interface Developer.
+
+Dependency Inversion Principle (DIP): High-level modules should not depend on low-level modules, both should depend on abstractions. This principle ensures that the high-level modules are not tightly coupled to the low-level modules, making it easier to change the implementation of the low-level modules without affecting the high-level modules. 
+public class Car {
+    private Engine engine;
+    public Car(Engine e) {
+        engine = e;
+    }
+    public void start() {
+        engine.start();
+    }
+}
+public class Engine {
+   public void start() {...}
+}
+The code will work, for now, but what if we wanted to add another engine type, let’s say a diesel engine? This will require refactoring the Car class.
+However, we can solve this by introducing a layer of abstraction. Instead of Car depending directly on Engine, let’s add an interface
+it should be like that 
+public interface Engine {
+    public void start();
+}
+ 	4) How to establish db connection using Spring data JPA	 
+               Add jpa depency -> db prop in prop file(connection,jpa) -> Repo extends JPARepository
+ 	5) what are SQL objects	 
+ 	6) What are different return types of stream operations
+6) Intermediate Operations :
+
+map(), filter(), distinct(), sorted(), limit(), skip()
+
+Terminal Operations :
+
+forEach(), toArray(), reduce(), collect(), min(), max(), count(), anyMatch(), allMatch(), noneMatch(), findFirst(), findAny()
+	 
+ 	7) Difference between Streams and Collections	
+Stream performs some operations on Collections.
+Collections - Store elements in different ways.
+ 
+ 	8) Use of Functional Interfaces in Streams
+Supplier:
+Supplier supplier = ()->x*x;
+
+Sysem.out.printlon(supplier.get());
+
+Function function =a->a*a;
+function.apply(a);
+Predicate predicate = x->x.length()>0
+if(predicate.test(x)) {}
+BIFunction biFunction = (a,b)->a+b;
+function.apply(a,b)
+BIPredicate bIPredicate = (x,y)->x.equals(y)
+if(bIPredicate.test(x,y)) {}
+
+ 	9) What are Api response codes
+200-success
+404 -Not found
+402 -Bad Gatway
+502-Internal Error
+201-Created.
+	 
+ 	 	 
+Harish	1.       Advantages of Sealed classes in java 17.	 
+ 	2.       Explanation of AWS Event Bridge.	 
+ 	3.       Difference between SQS and SNS.	 
+ 	4.       Lifecycle of development workflow.	 
+ 	5.       Http status codes.	 
+ 	6.       What is AWS lambda	 
+ 	7.       Why DynamoDB instead of RDS	 
+ 	8.       What is Data modularization	 
+ 	9.       Behavioral Design.	 
+ 	10.   Features of java 8.
+          Lambda,default methods,Streams,Optional,Date Api update(LocalDate,LocalDateTime,ZoneDateTime)
+	 
+ 	11.   Junit basics	 
+ 	 	 
+Sukhesh	1. what are the modules you have worked with spring? Spring Core,Web,Aop,Spring DataAccess	 
+ 	2.what is the database you have used, what is the difference between relational and non relational databases?	
+there relation ship b/w tables in   relational databases
+ 	3.what is Optional class in java 8? to prevent Nullpointer Exception.
+<Optional> User	 
+ 	4.what is stream in java 8, what are the methods of stream, what parameters does the collect method take?	 
+ 	5.what are the oops concepts?	 
+ 	6.what is the difference between abstract class and interface?	 
+ 	7.what is the difference between Error class and Exception class?	
+Error - Not recoverable error. it is external error. outofmemory,connetion issue
+Execption: it is code issue ioex,arryindexoutofboxex
+ 	 	 
+Shubhangi	1. What was your role in your last project? Project based questions	 
+ 	2. What technology did you use in your last project?	 
+ 	3. What is Micro service architecture	 
+ 	4. what is the database you have used?	 
+ 	5. How to establish database connection?	 
+ 	6. How to create REST APIs?	 
+ 	7. JUnit	 
+ 	8. What tool did you use to write Stories?	 
+ 	9. what tool did you used for uploading code?	 
+ 	10. where to write application related properties ?	 
+ 	 	 
+Megha	Q - How is bean initialization done in spring boot? How it is different from spring? @bean,@controller,@commponent. spring,xml defines bean defination.	Vivek Mittal
+ 	Q - What are the types of beans scope? Singleton,prototype,Request,session,global	 
+ 	Q - Explain singleton scope	 
+ 	Q - When are beans loaded in Spring boot?	@componentScan 
+ 	Q - What is the requirement for keys in a HashMap?	 
+ 	Q - Can we use String object as keys in HashMap? Objects are mutable, so how String can be used as keys in HashMap?	 
+ 	Q - Customer cs1 = new Customer("Alex", "1"); What is the requirement for cs1 to be used as key in hashmap?	 
+ 	map.put(cs1, "Pune")	
+ 	-override hashcode and equals method.
+ 
+ 	Q - How many objects will be created?	 
+ 	String str1 = "Alex";	 
+ 	String str2 = "Alex";	 
+ 	String str3 = new String("Alex")	
+	ans: 2 
+ 	Q - You have a large file - 1 million records. How will you process it?	 
+Java has many ways to read the file in chunks or line by line, like BufferedReader, Scanner, BufferedInputStream, 
+ 	Q - How to ensure ordering in Amazon Queues?	 
+ 	Q - How to kill a message in queue after some time?	 
+ 	Q - What is a Deadletter Queue?	 
+ 	Q - Explain Message visibilty in Queues?	 
+ 	Q - Which AWS sdk version was used in DynamoDB with reactive programming?	 
+ 	Q - Write a sample Predicate.	 
+ 	 	 
+megha 2nd Interview	Which tools have you used for Jira, Pipeline, Code Quality and code management?	 
+ 	Did you manage the pipelines or some other team did it?	 
+ 	Difference b/w monolithic and microservice architecture. Pros and Cons of both	 
+
+     Monolithic -single unit,tightly coupled. developed and deployed togother.
+                  challenges to trouble shoot.
+                  scaled /unscaled the whole app.
+                  
+Micorservices:
+   --Loose couples services.
+   --induvidually developed and deployed
+   --easy to develop
+   --Mixed tech
+  
+Cons: setting devops initially is very hard.
+
+ 	Explain Java 8 Streams. What is it? What all it does?	 
+ 	Difference between == and equals.	
+public class StringComparisonExample {  
+    public static void main(String[] args) {  
+        String word1 = "Java";  
+        String word2 = "Java";  
+        String word3 = new String("Java");  
+  
+        System.out.println(word1 == word2);       // Output: true  
+        System.out.println(word1 == word3);       // Output: false  
+  
+        System.out.println(word1.equals(word2));  // Output: true  
+        System.out.println(word1.equals(word3));  // Output: true  
+    }  
+} 
+ 	Difference between List, Set and Map interfaces. Where did you use it?	 
+ 	 	 
+Harish 2nd Interview	how to make fields threadsafe ?	 
+ 	difference between post and put ?	nonidempontent(post)-put is not. 
+ 	project related questions ?	 
+ 	basic working of SQS?	 
+ 	finally vs finalize ?	 after exception.(closing connection).vs garbage collection
+ 	lifecycle of spring beans ?	 
+ 	Different stages of objects in hibernate ?	 
+ 	mysql related basic questions ?	
+
+Hashmap - which operation is fast?
+where i want to declare @transactional in appliation? service layer.follow up question->super class lever or child class level?
+How to trace Microservice call? where trace ids,spanids are generated?
+caching - declaring caching mechanism at code level or server level. which is good?
+Spring security - life cycle? what is jwt?
+How do you handle when the task should be done within short period?
+vertical scaling vs horizontal scaling? how to scale up your application?
+
+
+[Monday 11:02 AM] Bharti, Tushar
+java 8 new features -- stream, functional interface and may be some program on these  
+[Monday 11:03 AM] Bharti, Tushar
+Hibernate -- difference between merge and update 
+difference between jpa and hibernate
+how to connect to multiple DB  
+ 
+
+important key words and thier used 
+
+Spring boot --> advantage and disadvantage 
+how auto configure internally works 
+
+how to connect to multiple DB 
+
+transaction management 
+
+2phase commit - Cordiator send message to prepare to participants
+-participant send ack to cordinatior they have prepared(means they updated db,not commitied)
+-Cordinator sends commit msg to commit to participants
+
+disadvantages:
+participant/cordinator fails to send msg. to solve it, they are logging the messages of (commit,ack).
+Cordinator decide if abort or do it successfuly
+
+3phase commit - Cordiator send message to prepare to participants
+-participant send ack to cordinatior they have prepared(means they updated db,not commitied)
+-Cordiator send message to participants that i got ack(precommit phase)
+-Cordinator sends commit msg to commit to participants
+
+Saga pattern:
+----------
+Chreograhp  -cordinates with service and do the commit or rollback
+
+Orchestration - all the service follows produces and consumer model. transfer event from one to another.
+if any fails, other preservice aborts transaction.
+
+
+security mangement 
+
+
+[Monday 11:06 AM] Bharti, Tushar
+jwt and auth 2 
+[Monday 11:06 AM] Bharti, Tushar
+DataBase --> view , joins , ACID
+
+how to debug services incase of issue in MS
+
+performance management and identifying the performance issue 
+
+Java--> 
+Multithreading -- semaphore, countdown latch, use of thread and way to create and which one  
+ 
+
+collection --> internal working 
+
+exception handling 
+
+Sharing the questions asked in previous interviews
+1	Introductions - explain about the technical work done in your recent project.
+2	Explain the Java11 features used.
+3	How are these Java11 features useful as compared to Java8?
+4	How were different features implemented before Java11 and what is the benfit we get out of using Java11?
+5	Explain the recent flow that you have coded, mention the classes, annotations used. 
+6	Exlain the response received
+7	What is the version of springboot used?
+8	Multithreading
+9	Functional interfaces
+10	Reactive programming
+11	Springboot concepts 
+12	BDD
+13	examples of where junit is used - positive & negative
+14	Define UT cases for the flow you have coded
+15	Setup of Kafka and how used, were there any recommendations made by you?
+
+Transaction Mangement?
+Spring security?
+traceID,spanID?
+Saga?
+Hash map?
+Performance Improvement?
+where oathToken stored?
+
+Thread example?
+GIT?
+find duplicate Number	in the list of integers?
+10,15,8,49,20,20,95,30,18
+
+List<Integer> list = Arrays.asList(10,15,8,49,20,20,95,30,18)
+
+Set<Integer> set = new Haset();  
+
+list.stream().filter(l-> !set.add(l)).forEach(System.out::println);
+
+Delete 25% of record?
+delete * from tab where id in (select Top 250 from tab); c1 ,c2,c3 
+
+second Highest Salary
+select max(salary) from employee where  salary < (select max(salary) from employee);
+
+Singleton?
+
+class Singleton 
+
+{
+
+  private static voliatile Singleton singleton = null;  
+private Singleton() {}
+
+public Singleton getInstance() {
+
+if(singleton !=null) {
+
+Synchorized(Singleton) {
+
+if(singleton !=null) {
+return new Singleton();
+}
+}
+}
+
+public clone() throw CloneUnsupportedException;
+public readResolve();
+
+Enum Singleton {
+return new Singleton }
+
+
+Solid principles:
+
+
+1.Explain about CI and CD
+
+
+Continuous integration and continuous deployment (CI/CD) is defined as a set of operating principles and capabilities that enables software changes to be delivered to users in a timely, repeatable, and secure manner by introducing automation into software development processes. This article discusses the need and importance of a CI/CD pipeline and recommends the best practices for 202
+
+
+2.Sprin boot Annotations
+@SpringBootApplication
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan
+Auto-Configuration Conditions
+@ConditionalOnClass, and @ConditionalOnMissingClass
+@ConditionalOnBean, and @ConditionalOnMissingBean
+@ConditionalOnProperty
+@ConditionalOnResource
+@ConditionalOnWebApplication and @ConditionalOnNotWebApplication
+@ConditionalExpression
+@Conditional
+
+ @ConditionalOnClass Annotation and @ConditionalOnMissingClass Annotation
+@ConditionalOnClass Annotation used to mark auto-configuration bean if the class in the annotation’s argument is present/absent.
+
+Example:
+@Configuration
+@ConditionalOnClass(MongoDBService.class) 
+  
+class MongoDBConfiguration { 
+    // Insert code here 
+}
+6. @ConditionalOnBean Annotation and @ConditionalOnMissingBean Annotation 
+These annotations are used to let a bean be included based on the presence or absence of specific beans.
+
+Example:
+@Bean
+@ConditionalOnMissingBean(type = "JpaTransactionManager") 
+  
+JpaTransactionManager jpaTransactionManager( 
+    EntityManagerFactory entityManagerFactory) 
+{ 
+    // Insert code here 
+}
+7. @ConditionalOnProperty Annotation 
+These annotations are used to let configuration be included based on the presence and value of a Spring Environment property.
+
+Example:
+@Bean
+@ConditionalOnProperty(name = "usemongodb", 
+                       havingValue = "local") 
+  
+DataSource 
+dataSource() 
+{ 
+    // Insert code here 
+} 
+  
+@Bean
+@ConditionalOnProperty(name = "usemongodb", 
+                       havingValue = "prod") 
+  
+DataSource 
+dataSource() 
+{ 
+    // Insert code here 
+}
+8. @ConditionalOnResource Annotation 
+These annotations are used to let configuration be included only when a specific resource is present in the classpath.
+
+Example:
+
+@ConditionalOnResource(resources = "classpath:mongodb.properties") 
+  
+Properties 
+additionalProperties() 
+{ 
+    // Insert code here 
+}
+9. @ConditionalOnExpression Annotation 
+These annotations are used to let configuration be included based on the result of a SpEL (Spring Expression Language) expression. 
+
+SpEL (Spring Expression Language): It is a powerful expression language that supports querying and manipulating an object graph at runtime. 
+
+Example:
+
+@Bean
+@ConditionalOnExpression("${env} && ${havingValue == 'local'}") 
+  
+DataSource dataSource()  
+{ 
+    // Insert code here 
+}
+10. @ConditionalOnCloudPlatform Annotation 
+These annotations are used to let configuration be included when the specified cloud platform is active.
+
+Example:
+
+@Configuration
+@ConditionalOnCloudPlatform(CloudPlatform.CLOUD_FOUNDRY) 
+  
+public class CloudConfigurationExample  
+{ 
+  // Insert code here 
+} 
+
+@Controller
+@RestController
+@RequestMapping
+@RequestParam
+@PathVariable
+@RequestBody
+@ResponseBody
+@ModelAttribute
+
+3.Exceptional Handling in spring boot - How do we use mutlipe exceptional handler ( like for controller1 -> exceptional handler1 controller2 - exceptional handler2 )
+https://nikhilsukhani.medium.com/mastering-exception-handling-in-spring-boot-using-controlleradvice-and-exceptionhandler-e676b5dd62ed#:~:text=3.,of%20exception%20it%20should%20handle.
+
+
+
+
+4. when do we use Controller Advice and Rest Controller Advice
+@RestControler = @Controller + @ResponseBody
+
+@RestControllerAdvice = @ControllerAdvice + @ResponseBody.
+5. How do we maintain multiple transaction managers
+public class TransactionalService {
+
+    @Transactional("account")
+    public void setSomethingInAccount() { ... }
+
+    @Transactional("businessData")
+    public void doSomethingInBusinessData() { ... }
+}
+6. Bean scopes and lifecycle
+singleton,prototype,session,golobal - containter start - instantiation - dep inj - intit -utilitiy methods - destory
+
+
+7. @postConstruct
+Spring calls the methods annotated with @PostConstruct only once, just after the initialization of bean properties. Keep in mind that these methods will run even if there’s nothing to initialize.
+
+The method annotated with @PostConstruct can have any access level, but it can’t be static.
+
+One possible use of @PostConstruct is populating a database. For instance, during development, we might want to create some default users:
+
+@Component
+public class DbInit {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostConstruct
+    private void postConstruct() {
+        User admin = new User("admin", "admin password");
+        User normalUser = new User("user", "user password");
+        userRepository.save(admin, normalUser);
+    }
+}
+Copy
+The
+8. Singleton related questions
+9. Build tools used in your project -
+Maven 
+A build tool is essential for the process of building. It is needed for the following procedures:
+
+Generating source code.
+Generating documentation from the source code.
+Compiling of source code.
+Packaging of the compiled codes into JAR files.
+Installing the packaged code in a local repository, server, or central repositor
+
+10. SFTP Related questions
+ 	
+ 
+1.	Java 8 latest features
+Lambda expressions
+Method references
+Functional interfaces
+Stream API
+Default methods
+Base64 Encode Decode
+Static methods in interface
+Optional class and many more
+
+2.	Functional interfaces in java
+Supplier,consumer,predicate
+3.	How can we create our own functional interface in java 8
+4.	What are design patters used in projects that I have worked upon and their examples
+5.	How to create singleton class in java
+6.	How to create Immutable class in Java
+7.	What is the difference between Spring and Spring Boot
+8.	 What is object class in java
+Using Object Class Methods
+The Object class provides multiple methods which are as follows:
+
+toString() method
+hashCode() method
+equals(Object obj) method
+finalize() method
+getClass() method
+clone() method
+wait(), notify() notifyAll() methods
+
+9.	What is Spring Boot AOP and it's disadvantages
+
+10.	What are parallel streams in java 8 and how to create it and it's real time application
+Java Parallel Streams is a feature of Java 8 and higher, meant for utilizing multiple cores of the processor. Normally any java code has one stream of processing, where it is executed sequentially. Whereas by using parallel streams, we can divide the code into multiple streams that are executed in parallel on separate cores and the final result is the combination of the individual outcomes. The order of execution, however, is not under our control
+
+11.	 What are the solid design principles
+12.	 What is optional class in java 8
+13.	 What is your exact role in your project
+14.	Microservice Architecture.
+
+15.	How can we monitor Spring Boot Microservices
+16.	Monolithic VS Microservices Architecture difference.
+
+MDD project:
+Memory Mangement
+class A extend B -extend-> c
+c have one method which has while loop if any exception throw. Class A method which calls method of c should not be affected.
+oauth
+Stream vs Collection\
+with framework, we can 
+
+
