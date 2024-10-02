@@ -1,0 +1,6 @@
+You have a Java web server in production that got stuck: stopped writing logs and doesn’t answer to http requests. How would you investigate?
+Logs say OutOfMemoryError - how would you investigate?
+Customer clicks on a button and gets NullPointerException, but same case works correctly in development environment. There are no log statements in code that help analyse the problem. How would you investigate and what step would you take to ease debugging such problems in future?
+You are investigating an issue and written a JUnit test - it fails as expected. So you start debugger and step over several times, but the issue is not reproduced. Why can this happen?
+Your production Java web server typically handles http request in <50ms, but now you see times raised to about 1 second. How would you investigate?
+You have multithreaded app which looks properly synchronized, but sometimes it seems that when particular field is read it returns old value. You suspect some synchronization issue, how would you investigate?
