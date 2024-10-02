@@ -1,0 +1,209 @@
+0:44 - How will you resolve bean dependency ambiguity?
+@qualifier - when some bean classes implements same type class or interface, to identify which should be injected,we use this.  we are   and @resource - it is for name specific,not type specific
+
+4:22 - Can we avoid this dependency ambiguity without using @Qualifier?  @resource 
+6:14 -  What is bean scope and can you explain different type of bean scope?
+Request - everytime bean will be created per http request
+prototype - everytime bean will be created
+Session - for each session one bean will be created
+21:58 - How to define custom bean scope? 
+
+27:55 - Can you provide a few real-time use cases for when to choose Singleton scope and Prototype scope
+
+singleton:
+----------
+application configuration
+database configuration
+service layter
+
+protype:
+-------
+thread safty
+user sessions
+heavy intitializations
+
+32:21 - Can we inject prototype bean in singleton bean? if yes what will happen if we inject prototype bean in singleton bean?
+40:20 - What is difference between spring singleton and plain singleton?
+41:20 -  What is the purpose of  the BeanPostProcessor interface in Spring, and how can you use it to customize bean initialization and destruction?
+
+
+REst Api status code:
+----------------------
+ 400 Bad Request
+401 Unauthorized
+402 Payment Required
+ 403 Forbidden
+ 500 Internal Server Error
+501 Not Implemented
+502 Bad Gateway
+503 Service Unavailable
+504 Gateway Timeout
+ 200 OK
+201 Created
+202 Accepted
+203 Non-Authoritative Information
+204 No Content
+
+0:42 - Have you worked on Restful webservices? If yes What all HTTP methods have you used in your project?
+Get - retrieve,post- create resource,put-update,patch,delete-delete resource
+PUT is used for creating or replacing resources, POST is used for creating or appending data to resources, and PATCH is used for partially updating existing resources.
+
+Idempotent -put,patch. Non-Idempotent-post
+1:41 - How can you specify the HTTP method type for your REST endpoint?
+6:09 - Can you design a rest endpoint, Assume that you have a product database, and your task is to create an API to filter a list of products by productType.
+Getmapping("getProd/{productType}")
+ReponseEntity<Product> getProduct(@PathVariable("productType") String productType) {
+Product prod = prodService.getproduct(prodType);
+return ReponseEntity.status(HttpStatus.ok).body(prod);
+}
+
+
+
+11:12 - Design endpoints in a way that takes "productType" as input. If the user provides this input, the endpoint should filter products based on the specified condition. If "productType" is not provided, the endpoint should return all the products.
+
+Getmapping("getProd/{productType}")
+ReponseEntity<Product> getProduct(@PathVariable("productType") String productType) {
+if(productType ==null)
+{ Product prod = prodService.getallproduct(); }
+else {
+	Product prod = prodService.getproduct(prodType);
+}
+return ReponseEntity.status(HttpStatus.ok).body(prod);
+}
+
+public interface ProductRepository extends JPARepository<ProductEntity,Long> {
+@Query("Select * from Product where product_type=?1")
+ProductEntity findProductbyproductType(String ProductType);
+}
+
+16:32 - What is the difference between @PathVariable and @RequestParam?
+
+@PathVariable:
+http//localhost:8080/getProduct/mobile
+extracts from URI.
+
+
+@RequestParam
+http//localhost:8080/getProduct?ProductType="mobile" 
+extracts from query param in url
+Getmapping("getProd/{productType}")
+ReponseEntity<Product> getProduct(@RequestParam(value="productType" required=false) String productType) { }
+required denotes param could be optional.
+
+0:23 - How will you handle exceptions in your project?
+13:30 - How can you avoid defining handlers for multiple exceptions, or what is the best practise for handling exceptions?
+19:15 - How will you validate or sanatize your input payload?
+27:17 - How can you populate validation error message to the end user?
+31:15 - How can you define custom bean validatation?
+35:08 - use case: lets say you find a bug in production environment and now you want to debug the scenario, how can you do that from your local?
+44:23 - How can you enable a specific environment without using profiles? OR what is the alternative to profiles to achieving same use case?
+49:36 - What is the difference between @Profile and @Conditional?
+50:53 - What is AOP?
+54:12 - What is pointcut & join points in AOP?
+56:30 - What are different type of advice?
+1:06:34 - use case - Can I use AOP of evaluate performance of a method or is this possible to design a logging framework to capture request and response body of a method?
+
+
+
+
+
+
+
+
+18:49 - Why did you use @RestController and why not @Controller?
+
+@ResController =controller + responsbody.
+
+26:22 - How can we deserialize a JSON request payload into an object within a Spring MVC controller?
+@RequestBody is enough to bind the JSON data sent from the clients.
+30:39 - Can we perform update operation in POST http method if yes then why do we need PUT mapping or put http method?
+Idempotent -put,patch. Non-Idempotent-post
+
+35:31 - Can we pass Request Body in GET HTTP method?yes
+
+37:24 - How can we perform content negotiation (XML/JSON) in Rest endpoint?
+
+@RequestMapping(value="/getsome" method=HttpMethod.Get produces={"application/json", "application/xml"} consumes={"application/json", "application/xml"})
+Configuration
+@EnableWebMvc
+public class WebConfig extends WebMvcConfigurerAdapter {
+
+@Override
+public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+
+    }
+
+41:15 - What all status code you have obsereved in your application?
+44:41 - How can you customize the status code for your endpoint?
+@ResponseStatus(HttpStatus.CREATED)
+
+46:57 - How can you enable cross origin?
+it gives api access by using origin domain(http//localhost:8088//) pattern :/api/*, methods:get,put,post,patch
+50:47 - How can you upload a file in spring? 
+@postmapping("fileupload")
+String fileupload(@RequestParam("file") MultipartFile file) 
+
+53:52 - How do you maintain versioning for your REST API?
+passing apiversion in request param, we can call correct logic in api
+@RequestHeaders("Api-version") String version
+2 Apis call..one for version 1 and another is v2.
+
+
+1:00:29 - How will you document your REST API?add dependency openApi (Swagger)
+1:04:52 - How can you hide certain REST endpoints to prevent them from being exposed externally?
+@hidden in the top of the api
+1:08:07 - How will you consume restful API? RestTemplate,webclient,fiegnclient -declarative style endpoints in the interface,AdvanceRestclient
+
+
+0:23 - How will you handle exceptions in your project?
+1.write customer exception which extend runtime exeception or checked exception
+2.write a class annoted with restcontroladvice. write handlerException annoted with exceptionhandler and have logic which returns errorlist( springboot 3 finalproblem)
+13:30 - How can you avoid defining handlers for multiple exceptions, or what is the best practise for handling exceptions?
+for below 2 exception, we have calling custom exceptions
+try {
+
+if(some condition)
+throw new RuntimeException
+
+if(some condition)
+throw new SomeException
+
+} catch(Exception ex) {
+
+throw new DuplicateUserException(ex)
+}
+
+19:15 - How will you validate or sanatize your input payload?
+Bean class - add validation with annotation(@Notblank,@NotNull.. etc)
+public void somemethod(@Valid @Requestbody User user) {}
+
+27:17 - How can you populate validation error message to the end user?
+
+@ExceptionHandler(MethodArguementNotValidException.class)
+public Map<String,String> handleMethodArguementNotValidException(MethodArguementNotValidException ex) {
+Map<String,String> errorsMap = new Hashmap<>();
+ex.getbindingResult().getErrorFields().foreach(error->{errorsMap.put(error.getErrorField(),error.getErrorMessage());
+return errorsMap;
+}
+
+31:15 - How can you define custom bean validatation?
+
+create own validation annotation with @constraint(validatedby=valadiator.class)
+public class Valadiator implements contraintValidatior<validProductTypeannotation,String>{
+@override
+public boolean isValid(String productType,ConstraintValidatorContext c) {
+validate logic;
+}
+
+35:08 - use case: lets say you find a bug in production environment and now you want to debug the scenario, how can you do that from your local?
+spring.profile.active = prod
+
+44:23 - How can you enable a specific environment without using profiles? OR what is the alternative to profiles to achieving same use case?
+if app.profile.active=prod is there in prop file. @Conditionalproperty(app.profile.active=prod) then load the prod configuration beans
+49:36 - What is the difference between @Profile and @Conditional?
+50:53 - What is AOP? it proved crosscutting concerns by help of joinpoint pointcut-where crosscutting(logging,auditing,transaction.. logic are invoked)
+54:12 - What is pointcut & join points in AOP?
+56:30 - What are different type of advice? before,after,around,throw advice (methods)
+1:06:34 - use case - Can I use AOP of evaluate performance of a method or is this possible to design a logging framework to capture request and response body of a method? 1.aroundAdvice used 2.@payloads in the method
+
+
