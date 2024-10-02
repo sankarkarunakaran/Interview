@@ -1,0 +1,98 @@
+12 factor App principles
+----------
+- code base - single code base for build and staging,prod
+-configuration -externalization
+-dependency - explicity versions and isolate dependencies
+-dev/prod parity
+-backing services
+
+performance issues : 
+------------
+Java visual Vm
+Heap and Metspace - used size is full
+Thread Dumb -can view available threads
+we can check which classes,methods and variable is taking more memory
+perform gc
+-open and close properly file handles,network connection,db conn
+-object creation properly(string builder)
+-proper collections
+-Reuse code
+-Deadlocks(locking order,locking timeout)-proper sync,locking mechinsm,timeout,
+-Avoid Writing Long Methods(short)
+-Use Caching
+-Optimize If-Else Statements 
+-Use Lazy loading(singleton)
+-DB connection leak issues
+-Network connection issues
+-
+
+Solid Princples:
+-----------
+Single Responsibility Principle (SRP): employee(dont add department)
+Open/Closed Principle (OCP):Shape(circle,square...)
+Liskov Substitution Principle (LSP):bird,sparrow -> sparrow is replacable object of bird object.
+Interface segretion : interface should be small. mobile { camera,audio,call functions} After IS, camera class,audio class functions.
+
+db locking:
+---------
+Shared locks
+Exclusive locks
+
+isolation level:Read Uncommitted - Transaction can read uncommited changes
+Read Committed Transaction can read only commited changes
+Repeatable Read -transaction can hold read lock and write lock, other transactions cant do anything
+Serializable - Strict isolation level, transaction is done in sequence manner
+@Transactional(propagation=TransactionDefinition.NESTED,
+               isolation=TransactionDefinition.ISOLATION_READ_UNCOMMITTED)
+hateos -In HATEOAS, we insert the hypermedia links in the API response contents.
+
+Hashmap - which operation is fast?
+where i want to declare @transactional in appliation? service layer.follow up question->super class lever or child class level?
+How to trace Microservice call? where trace ids,spanids are generated?
+caching - declaring caching mechanism at code level or server level. which is good?
+Spring security - life cycle? what is jwt?
+How do you handle when the task should be done within short period?
+vertical scaling vs horizontal scaling? how to scale up your application?
+
+java 8 new features -- stream, functional interface and may be some program on these  
+Hibernate -- difference between merge and update 
+difference between jpa and hibernate
+
+Jpa is specification (Like interface) and hibernate is implementation.
+
+how to connect to multiple DB :
+Entity(order) -> Repository -> Datasource     -> SQL DB
+ 			   |
+			EntityManager
+			   |
+			TxMananger
+Entity(payment) -> Repository -> Datasource     -> Oracle DB
+ 			   |
+			EntityManager
+			   |
+			TxMananger
+	
+	
+important key words and thier used 
+Spring boot --> advantage and disadvantage 
+how auto configure internally works 
+how to connect to multiple DB 
+transaction management 
+security mangement 
+two phase commit or Saga -- architecture 
+jwt and auth 2 
+DataBase --> view , joins , ACID
+how to debug services incase of issue in MS
+performance management and identifying the performance issue 
+
+
+sid 
+prometheus -
+
+java 8
+flow app
+annotation
+spring batch
+feature of spring boot
+
+
