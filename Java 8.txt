@@ -1,0 +1,77 @@
+Java 8 Features:
+----------------
+Lambda Expressions
+Stream API
+Default methods
+Optional
+Method References
+Date Apis
+Static Methods
+Static Interface
+
+
+Lambda Expressions
+ - No function name,no access modifier, no return type
+Before lambda:
+public void add(int a,int b) {
+system.out.println("the addition is " +(a+b));
+}
+
+After lambda:
+
+BiConsumer<Integer,Integer> biconsumer = (a,b)->Sysout(a+b);
+biconsumer.accept(a,b);
+
+funtional interface - single abstract method, more than default/static methods
+consumer
+
+UBS predicate:
+-riskcustomer 
+
+Predicate<Customer> pred = customer->customer.getCreditRiskAmt()>10000;
+if(pred.test(customer))
+{
+}
+
+default dollar. converting to euro.
+ Function<Double,Double> covertedRate = (input) -> input * dollar_euro_rate;
+ rate = covertedRate.apply(input);
+
+ Supplier<Integer> rds = () -> new Random().nextInt(10);
+
+Map:
+list of customer name:
+ List<String> stafName = staff.stream().map(s->s.getName()).collect(Collectors.toList());
+
+
+Default methods:
+-------------
+provide default implementation to impl classes
+- all impl classes doesn not require to implement default method. whichever want, those can use it.
+-diamond problem : if two interfaces use same name default methods.
+                      we can use is as InterfaceName.super.defaultmethodname(). 
+
+method reference:
+------------
+it gives reference the implementation of abstract method.
+if there is no method of implementation for that, we can write lambda expression.
+-code reusable
+
+
+public class methodReferenceDemo {
+
+  public static void main(String args[]) {
+      FunctionalInterface fi = Test :: methodReferenceImpl;
+         fi.singleAbstractMethod();
+}}
+
+class Test {
+
+       public static void methodReferenceImpl() {
+             sysout(" method reference");
+}
+}
+
+mockito 
+refer:
+https://rathod-ajay.medium.com/top-30-java-8-interview-questions-answers-to-ace-your-java-interview-includes-coding-questions-d19fbd4510cd
